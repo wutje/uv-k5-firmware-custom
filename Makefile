@@ -548,15 +548,13 @@ else
 endif
 
 all: $(TARGET)
-	$(OBJCOPY) -O binary $< $<.bin
-
+	@$(OBJCOPY) -O binary $< $<.bin
 	$(info PYTHON = $(PYTHON))
-
-	-python fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
-	-python3 fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
+	@-python fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
+	@-python3 fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
 #	-$(PYTHON) fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
 
-	$(SIZE) $<
+	@$(SIZE) $<
 
 debug:
 	/opt/openocd/bin/openocd -c "bindto 0.0.0.0" -f interface/jlink.cfg -f dp32g030.cfg
@@ -567,19 +565,23 @@ flash:
 version.o: .FORCE
 
 $(TARGET): $(OBJS)
-	$(LD) $(LDFLAGS) $^ -o $@ $(LIBS)
+	$(info [LD $<])
+	@$(LD) $(LDFLAGS) $^ -o $@ $(LIBS)
 
 bsp/dp32g030/%.h: hardware/dp32g030/%.def
 
 %.o: %.c | $(BSP_HEADERS)
-	$(CC) $(CFLAGS) $(INC) -c $< -o $@
+	$(info [CC $<])
+	@$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
 %.o: %.S
-	$(AS) $(ASFLAGS) $< -o $@
+	$(info [AS $<])
+	@$(AS) $(ASFLAGS) $< -o $@
 
 .FORCE:
 
 -include $(DEPS)
 
 clean:
-	rm -f $(TARGET).bin $(TARGET).packed.bin $(TARGET) $(OBJS) $(DEPS)
+	$(info [RM $(BUILDDIR)])
+	@rm -rf $(BUILDDIR)
