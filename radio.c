@@ -379,7 +379,7 @@ void RADIO_configure_channel(const unsigned int VFO, const unsigned int configur
 			BK4819_write_reg(0x13, (g_orig_lnas << 8) | (g_orig_lna << 5) | (g_orig_mixer << 3) | (g_orig_pga << 0));
 		}
 	#else
-		if (p_vfo->mod_mode != MOD_MODE_FM)
+		if (p_vfo->channel.mod_mode != MOD_MODE_FM)
 		{
 			#ifdef ENABLE_PANADAPTER
 				if (!PAN_scanning())
