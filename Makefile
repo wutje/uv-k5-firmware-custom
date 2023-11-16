@@ -1,112 +1,28 @@
-
-# compile options (see README.md for descriptions)
-#
-# 0 = remove code
-# 1 = include code
-
+#Compile options for developers / debugging
 ENABLE_CLANG                     := 0
 ENABLE_SWD                       := 0
 ENABLE_OVERLAY                   := 0
 ENABLE_LTO                       := 1
-#
+
 # UART Programming 2.9 kB
 ENABLE_UART                      := 1
 ENABLE_UART_DEBUG                := 0
-#
-# AirCopy 2.5 kB
-ENABLE_AIRCOPY                   := 0
-ENABLE_AIRCOPY_REMEMBER_FREQ     := 1
-ENABLE_AIRCOPY_RX_REBOOT         := 0
-#
-# FM Radio 4.2 kB
-ENABLE_FMRADIO_64_76             := 0
-ENABLE_FMRADIO_76_90             := 0
-ENABLE_FMRADIO_76_108            := 0
-ENABLE_FMRADIO_875_108           := 1
-ENABLE_FMRADIO_64_108            := 0
-#
-# NOAA 1.2 kB
-ENABLE_NOAA                      := 0
-# Voice 1.7 kB
-ENABLE_VOICE                     := 0
-ENABLE_MUTE_RADIO_FOR_VOICE      := 0
-# Tx on Voice 1.0 kB
-ENABLE_VOX                       := 1
-ENABLE_VOX_MORE_SENSITIVE        := 1
-# Tx Alarm 600 B
-ENABLE_ALARM                     := 0
-ENABLE_TX_TONE_HZ                := 1750
-#
-# MDC1200 2.8 kB
-ENABLE_MDC1200                   := 0
-ENABLE_MDC1200_SHOW_OP_ARG       := 1
-ENABLE_MDC1200_SIDE_BEEP         := 1
-#
-ENABLE_PWRON_PASSWORD            := 0
-ENABLE_RESET_AES_KEY             := 0
-ENABLE_BIG_FREQ                  := 0
-#
-# DTMF_CALLING 2.8 kB
-ENABLE_DTMF_CALLING              := 0
-ENABLE_DTMF_LIVE_DECODER         := 0
-ENABLE_DTMF_TIMING_SETTINGS      := 0
-ENABLE_DTMF_CALL_FLASH_LIGHT     := 0
-# Kill and Revive 400 B
-ENABLE_DTMF_KILL_REVIVE          := 0
-#
-ENABLE_SHOW_FREQ_IN_CHAN         := 1
-# small bold 580 B
-ENABLE_SMALL_BOLD                := 1
-# smallest font 2 kB
-#ENABLE_SMALLEST_FONT            := 0
-# trim trailing 44 B
-ENABLE_TRIM_TRAILING_ZEROS       := 0
-ENABLE_WIDE_RX                   := 1
-ENABLE_TX_WHEN_AM                := 0
-#
-# Frequency calibration 188 B
-ENABLE_F_CAL_MENU                := 0
-# FM DEV CAL 250 B
-ENABLE_FM_DEV_CAL_MENU           := 0
-ENABLE_TX_UNLOCK_MENU            := 0
-#ENABLE_TX_POWER_CAL_MENU        := 0
-ENABLE_TX_POWER_FIX              := 1
-ENABLE_CTCSS_TAIL_PHASE_SHIFT    := 1
-ENABLE_CONTRAST                  := 0
-ENABLE_BOOT_BEEPS                := 0
-ENABLE_FLASH_LIGHT_SOS_TONE      := 0
-ENABLE_SHOW_CHARGE_LEVEL         := 0
-ENABLE_REVERSE_BAT_SYMBOL        := 0
-ENABLE_FREQ_SEARCH_LNA           := 0
-ENABLE_FREQ_SEARCH_TIMEOUT       := 0
-ENABLE_CODE_SEARCH_TIMEOUT       := 0
-# scan ignore list 740 B
-ENABLE_SCAN_IGNORE_LIST          := 1
-# scan ranges 400 B
-ENABLE_SCAN_RANGES               := 1
-# AM Fix 800 B
-ENABLE_AM_FIX                    := 1
-ENABLE_AM_FIX_SHOW_DATA          := 0
-ENABLE_SQUELCH_MORE_SENSITIVE    := 0
-ENABLE_SQ_OPEN_WITH_UP_DN_BUTTS  := 1
-ENABLE_FASTER_CHANNEL_SCAN       := 1
-ENABLE_COPY_CHAN_TO_VFO_TO_CHAN  := 1
-# Tx Audio Bar 300 B
-ENABLE_TX_AUDIO_BAR              := 0
-ENABLE_TX_AUDIO_BACKLIGHT        := 0
-# Side Button Menu 300 B
-ENABLE_SIDE_BUTT_MENU            := 0
-# Key Lock 400 B
-ENABLE_KEYLOCK                   := 0
-# panadapter 1.5kB
-ENABLE_PANADAPTER                := 1
-ENABLE_PANADAPTER_PEAK_FREQ      := 0
-# single VFO 1.5kB
-ENABLE_SINGLE_VFO_CHAN           := 1
 
-#############################################################
+#Default to the default profile
+#This can be overruled by invoking make with PROFILE set :
+# make PROFILE=all
+# This will include profile/all.mk
+PROFILE?=default
+$(info PROFILE = $(PROFILE))
 
-TARGET = firmware
+PROFILE_FILE=profiles/$(PROFILE).mk
+include $(PROFILE_FILE)
+
+
+#Setup a build directory per profile we build
+BUILD=build
+BUILDDIR=$(BUILD)/$(PROFILE)
+TARGET = $(BUILDDIR)/firmware
 
 GIT_HASH_TMP := $(shell git rev-parse --short HEAD)
 ifeq ($(GIT_HASH_TMP), )
@@ -146,101 +62,101 @@ BSP_DEFINITIONS := $(wildcard hardware/*/*.def)
 BSP_HEADERS     := $(patsubst hardware/%,bsp/%,$(BSP_DEFINITIONS))
 BSP_HEADERS     := $(patsubst %.def,%.h,$(BSP_HEADERS))
 
-OBJS =
+AS_SOURCES = start.S
+C_SOURCES =
 # Startup files
-OBJS += start.o
-OBJS += init.o
+C_SOURCES += init.c
 ifeq ($(ENABLE_OVERLAY),1)
-	OBJS += sram-overlay.o
+	C_SOURCES += sram-overlay.c
 endif
-OBJS += external/printf/printf.o
+C_SOURCES += external/printf/printf.c
 
 # Drivers
-OBJS += driver/adc.o
+C_SOURCES += driver/adc.c
 ifeq ($(ENABLE_UART),1)
-	OBJS += driver/aes.o
+	C_SOURCES += driver/aes.c
 endif
-OBJS += driver/backlight.o
+C_SOURCES += driver/backlight.c
 ifeq ($(ENABLE_FMRADIO), 1)
-	OBJS += driver/bk1080.o
+	C_SOURCES += driver/bk1080.c
 endif
-OBJS += driver/bk4819.o
-OBJS += driver/crc.o
-OBJS += driver/eeprom.o
+C_SOURCES += driver/bk4819.c
+C_SOURCES += driver/crc.c
+C_SOURCES += driver/eeprom.c
 ifeq ($(ENABLE_OVERLAY),1)
-	OBJS += driver/flash.o
+	C_SOURCES += driver/flash.c
 endif
-OBJS += driver/gpio.o
-OBJS += driver/i2c.o
-OBJS += driver/keyboard.o
-OBJS += driver/spi.o
-OBJS += driver/st7565.o
-OBJS += driver/system.o
-OBJS += driver/systick.o
+C_SOURCES += driver/gpio.c
+C_SOURCES += driver/i2c.c
+C_SOURCES += driver/keyboard.c
+C_SOURCES += driver/spi.c
+C_SOURCES += driver/st7565.c
+C_SOURCES += driver/system.c
+C_SOURCES += driver/systick.c
 ifeq ($(ENABLE_UART),1)
-	OBJS += driver/uart.o
+	C_SOURCES += driver/uart.c
 endif
 
 # Main
-OBJS += app/action.o
+C_SOURCES += app/action.c
 ifeq ($(ENABLE_AIRCOPY),1)
-	OBJS += app/aircopy.o
+	C_SOURCES += app/aircopy.c
 endif
-OBJS += app/app.o
-OBJS += app/dtmf.o
+C_SOURCES += app/app.c
+C_SOURCES += app/dtmf.c
 ifeq ($(ENABLE_FMRADIO), 1)
-	OBJS += app/fm.o
+	C_SOURCES += app/fm.c
 endif
-OBJS += app/generic.o
-OBJS += app/main.o
-OBJS += app/menu.o
-OBJS += app/search.o
+C_SOURCES += app/generic.c
+C_SOURCES += app/main.c
+C_SOURCES += app/menu.c
+C_SOURCES += app/search.c
 ifeq ($(ENABLE_SCAN_IGNORE_LIST),1)
-	OBJS += freq_ignore.o
+	C_SOURCES += freq_ignore.c
 endif
 ifeq ($(ENABLE_UART),1)
-	OBJS += app/uart.o
+	C_SOURCES += app/uart.c
 endif
 ifeq ($(ENABLE_AM_FIX), 1)
-	OBJS += am_fix.o
+	C_SOURCES += am_fix.c
 endif
-OBJS += audio.o
-OBJS += bitmaps.o
-OBJS += board.o
-OBJS += dcs.o
-OBJS += font.o
-OBJS += frequencies.o
-OBJS += functions.o
-OBJS += helper/battery.o
-OBJS += helper/boot.o
+C_SOURCES += audio.c
+C_SOURCES += bitmaps.c
+C_SOURCES += board.c
+C_SOURCES += dcs.c
+C_SOURCES += font.c
+C_SOURCES += frequencies.c
+C_SOURCES += functions.c
+C_SOURCES += helper/battery.c
+C_SOURCES += helper/boot.c
 ifeq ($(ENABLE_MDC1200),1)
-	OBJS += mdc1200.o
+	C_SOURCES += mdc1200.c
 endif
-OBJS += misc.o
-OBJS += radio.o
-OBJS += scheduler.o
-OBJS += settings.o
+C_SOURCES += misc.c
+C_SOURCES += radio.c
+C_SOURCES += scheduler.c
+C_SOURCES += settings.c
 ifeq ($(ENABLE_AIRCOPY),1)
-	OBJS += ui/aircopy.o
+	C_SOURCES += ui/aircopy.c
 endif
-OBJS += ui/battery.o
+C_SOURCES += ui/battery.c
 ifeq ($(ENABLE_FMRADIO), 1)
-	OBJS += ui/fmradio.o
+	C_SOURCES += ui/fmradio.c
 endif
-OBJS += ui/helper.o
-OBJS += ui/inputbox.o
+C_SOURCES += ui/helper.c
+C_SOURCES += ui/inputbox.c
 ifeq ($(ENABLE_PWRON_PASSWORD),1)
-	OBJS += ui/lock.o
+	C_SOURCES += ui/lock.c
 endif
-OBJS += ui/main.o
-OBJS += ui/menu.o
-OBJS += ui/search.o
-OBJS += ui/status.o
-OBJS += ui/ui.o
-OBJS += version.o
-OBJS += main.o
+C_SOURCES += ui/main.c
+C_SOURCES += ui/menu.c
+C_SOURCES += ui/search.c
+C_SOURCES += ui/status.c
+C_SOURCES += ui/ui.c
+C_SOURCES += version.c
+C_SOURCES += main.c
 ifeq ($(ENABLE_PANADAPTER),1)
-	OBJS += panadapter.o
+	C_SOURCES += panadapter.c
 endif
 
 ifeq ($(OS), Windows_NT)
@@ -547,14 +463,7 @@ else
 	PYTHON = $(shell which python || which python3)
 endif
 
-all: $(TARGET)
-	@$(OBJCOPY) -O binary $< $<.bin
-	$(info PYTHON = $(PYTHON))
-	@-python fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
-	@-python3 fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
-#	-$(PYTHON) fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
-
-	@$(SIZE) $<
+all: $(TARGET).packed.bin $(TARGET).bin $(TARGET).elf $(OBJS)
 
 debug:
 	/opt/openocd/bin/openocd -c "bindto 0.0.0.0" -f interface/jlink.cfg -f dp32g030.cfg
@@ -562,20 +471,39 @@ debug:
 flash:
 	/opt/openocd/bin/openocd -c "bindto 0.0.0.0" -f interface/jlink.cfg -f dp32g030.cfg -c "write_image firmware.bin 0; shutdown;"
 
-version.o: .FORCE
+$(BUILDDIR)/version.o: .FORCE
 
-$(TARGET): $(OBJS)
-	$(info [LD $<])
+OBJS=
+OBJS+=$(patsubst %.c,$(BUILDDIR)/%.o,$(C_SOURCES))
+OBJS+=$(patsubst %.S,$(BUILDDIR)/%.o,$(AS_SOURCES))
+
+#Create elf file, usefull for debugging and base for other formats
+%.elf: $(OBJS)
+	$(info [LD $@])
 	@$(LD) $(LDFLAGS) $^ -o $@ $(LIBS)
+
+#Create the bin file, used by k5prog
+%.bin: %.elf
+	$(info [BIN $@])
+	@$(SIZE) $<
+	@$(OBJCOPY) -O binary $< $@
+
+#Create packed and obfuscated .bin file used by original Windows application
+%.packed.bin: %.bin
+	$(info [PACKED BIN $@])
+	$(info PYTHON = $(PYTHON))
+	@-$(PYTHON) fw-pack.py $< $(GIT_HASH) $@
 
 bsp/dp32g030/%.h: hardware/dp32g030/%.def
 
-%.o: %.c | $(BSP_HEADERS)
+$(BUILDDIR)/%.o: %.c $(PROFILE_FILE) | $(BSP_HEADERS)
 	$(info [CC $<])
+	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
-%.o: %.S
+$(BUILDDIR)/%.o: %.S $(PROFILE_FILE)
 	$(info [AS $<])
+	@mkdir -p $(dir $@)
 	@$(AS) $(ASFLAGS) $< -o $@
 
 .FORCE:
