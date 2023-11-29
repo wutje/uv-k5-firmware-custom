@@ -273,12 +273,12 @@ void AUDIO_PlayBeep(beep_type_t Beep)
 				GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_VOICE_1);
 			else
 				GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_VOICE_1);
-			SYSTICK_Delay250us(4000);
+			SYSTICK_Delay250ns(4000);
 			GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_VOICE_0);
-			SYSTICK_Delay250us(4800);
+			SYSTICK_Delay250ns(4800);
 			GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_VOICE_0);
 			VoiceID <<= 1;
-			SYSTICK_Delay250us(800);
+			SYSTICK_Delay250ns(800);
 		}
 	}
 
