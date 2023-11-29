@@ -575,8 +575,9 @@ void UI_DisplayCenterLine(void)
 
 	#if defined(ENABLE_AM_FIX) && defined(ENABLE_AM_FIX_SHOW_DATA)
 		// show the AM-FIX debug data
-		if (rx && g_vfo_info[g_rx_vfo_num].mod_mode != MOD_MODE_FM && g_eeprom.config.setting.am_fix)
+		if (rx && g_vfo_info[g_rx_vfo_num].channel.mod_mode != MOD_MODE_FM && g_eeprom.config.setting.am_fix)
 		{
+                        char str[22];
 			g_center_line = CENTER_LINE_AM_FIX_DATA;
 			AM_fix_print_data(g_rx_vfo_num, str);
 			UI_PrintStringSmall(str, 2, 0, line);

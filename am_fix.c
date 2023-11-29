@@ -455,6 +455,8 @@ void AM_fix_set_front_end_gains(const int vfo)
 }
 
 #ifdef ENABLE_AM_FIX_SHOW_DATA
+#include "ui/ui.h"
+#include "app/dtmf.h"
 
 	void AM_fix_print_data(const int vfo, char *s)
 	{
