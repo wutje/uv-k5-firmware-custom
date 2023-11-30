@@ -833,10 +833,10 @@ const char *state_list[] = {"", "BUSY", "BAT LOW", "TX DISABLE", "TIMEOUT", "ALA
 
 			// show the DTMF decoding symbol
 			#ifdef ENABLE_KILL_REVIVE
-				if (g_vfo_info[vfo_num].channel.dtmf_decoding_enable || g_eeprom.config.setting.radio_disabled)
+				if (SETTINGS_is_dtmf_enabled(&g_vfo_info[vfo_num]) || g_eeprom.config.setting.radio_disabled)
 					UI_PrintStringSmall("DTMF", x, 0, y);
 			#else
-				if (g_vfo_info[vfo_num].channel.dtmf_decoding_enable)
+				if (SETTINGS_is_dtmf_enabled(&g_vfo_info[vfo_num]))
 					UI_PrintStringSmall("DTMF", x, 0, y);
 			#endif
 		}
@@ -1382,10 +1382,10 @@ void UI_DisplayMain(void)
 
 		// show the DTMF decoding symbol
 		#ifdef ENABLE_KILL_REVIVE
-			if (g_vfo_info[vfo_num].channel.dtmf_decoding_enable || g_eeprom.config.setting.radio_disabled)
+                        if (SETTINGS_is_dtmf_enabled(&g_vfo_info[vfo_num]) || g_eeprom.config.setting.radio_disabled)
 				UI_PrintStringSmall("DTMF", 78, 0, line + 2);
 		#else
-			if (g_vfo_info[vfo_num].channel.dtmf_decoding_enable)
+                        if (SETTINGS_is_dtmf_enabled(&g_vfo_info[vfo_num]))
 				UI_PrintStringSmall("DTMF", 78, 0, line + 2);
 				//UI_PrintStringSmallest("DTMF", 78, (line + 2) * 8, false, true);
 		#endif

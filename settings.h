@@ -618,4 +618,13 @@ void         SETTINGS_fetch_channel_name(char *s, const int channel);
 unsigned int SETTINGS_fetch_frequency_step_setting(const int channel, const int vfo);
 void         SETTINGS_factory_reset(bool bIsAll);
 
+static inline bool SETTINGS_is_dtmf_enabled(const vfo_info_t *vfo)
+{
+#ifdef ENABLE_DTMF
+    return vfo->channel.dtmf_decoding_enable;
+#else
+    (void)vfo;
+    return false;
+#endif
+}
 #endif

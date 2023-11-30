@@ -1282,7 +1282,7 @@ void MENU_ShowCurrentSetting(void)
 			return;
 
 		case MENU_DTMF_DCD:
-			g_sub_menu_selection = g_tx_vfo->channel.dtmf_decoding_enable;
+			g_sub_menu_selection = SETTINGS_is_dtmf_enabled(g_tx_vfo);
 			break;
 
 		case MENU_DTMF_LIST:

@@ -251,9 +251,9 @@ static void APP_process_new_receive(void)
 	{	// not scanning
 
 		#ifdef ENABLE_KILL_REVIVE
-			if (g_rx_vfo->channel.dtmf_decoding_enable || g_eeprom.config.setting.radio_disabled)
+			if (SETTINGS_is_dtmf_enabled(g_rx_vfo) || g_eeprom.config.setting.radio_disabled)
 		#else
-			if (g_rx_vfo->channel.dtmf_decoding_enable)
+			if (SETTINGS_is_dtmf_enabled(g_rx_vfo))
 		#endif
 		{	// DTMF DCD is enabled
 
@@ -1025,9 +1025,9 @@ void APP_process_radio_interrupts(void)
 				#endif
 
 				#ifdef ENABLE_KILL_REVIVE
-					if (g_rx_vfo->channel.dtmf_decoding_enable || g_eeprom.config.setting.radio_disabled)
+					if (SETTINGS_is_dtmf_enabled(g_rx_vfo) || g_eeprom.config.setting.radio_disabled)
 				#else
-					if (g_rx_vfo->channel.dtmf_decoding_enable)
+					if (SETTINGS_is_dtmf_enabled(g_rx_vfo))
 				#endif
 				{
 					if (g_dtmf_rx_index >= (sizeof(g_dtmf_rx) - 1))
