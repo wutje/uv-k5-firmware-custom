@@ -123,12 +123,14 @@ void FUNCTION_Select(function_type_t Function)
 					g_fm_restore_tick_10ms = g_eeprom.config.setting.scan_hold_time * 50;
 			#endif
 
+#ifdef ENABLE_DTMF
 			if (g_dtmf_call_state == DTMF_CALL_STATE_CALL_OUT ||
 			    g_dtmf_call_state == DTMF_CALL_STATE_RECEIVED ||
 				g_dtmf_call_state == DTMF_CALL_STATE_RECEIVED_STAY)
 			{
 				g_dtmf_auto_reset_time_500ms = g_eeprom.config.setting.dtmf.auto_reset_time * 2;
 			}
+#endif
 
 			return;
 
@@ -262,6 +264,7 @@ void FUNCTION_Select(function_type_t Function)
 				}
 				else
 			#endif
+#ifdef ENABLE_DTMF
 			if (!DTMF_Reply())
 			{
 			#ifdef ENABLE_MDC1200
@@ -291,7 +294,7 @@ void FUNCTION_Select(function_type_t Function)
 					BK4819_stop_tones(true);
 				}
 			}
-
+#endif
 			if (g_eeprom.config.setting.enable_scrambler)
 				BK4819_set_scrambler(g_current_vfo->channel.scrambler);
 			

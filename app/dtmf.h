@@ -65,6 +65,8 @@ enum dtmf_call_mode_e {
 };
 typedef enum dtmf_call_mode_e dtmf_call_mode_t;
 
+
+#ifdef ENABLE_DTMF
 extern char               g_dtmf_string[15];
 
 extern char               g_dtmf_input_box[15];
@@ -108,4 +110,14 @@ void DTMF_Append(const char vode);
 void DTMF_HandleRequest(void);
 bool DTMF_Reply(void);
 
+#else
+
+static inline void DTMF_clear_RX(void){}
+static inline void DTMF_clear_input_box(void){}
+static inline char DTMF_GetCharacter(const unsigned int code){(void) code; return 0;}
+
+#define g_dtmf_input_mode false
+#define g_dtmf_call_state DTMF_CALL_STATE_NONE
+#define g_dtmf_reply_state  DTMF_REPLY_NONE
+#endif
 #endif

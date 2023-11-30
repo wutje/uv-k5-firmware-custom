@@ -703,13 +703,14 @@ void MAIN_Key_EXIT(bool key_pressed, bool key_held)
 
 		g_beep_to_play = BEEP_1KHZ_60MS_OPTIONAL;
 
+#ifdef ENABLE_DTMF
 		if (g_dtmf_call_state != DTMF_CALL_STATE_NONE && g_current_function != FUNCTION_TRANSMIT)
 		{	// clear CALL mode being displayed
 			g_dtmf_call_state = DTMF_CALL_STATE_NONE;
 			g_update_display  = true;
 			return;
 		}
-
+#endif
 		#ifdef ENABLE_FMRADIO
 			if (!g_fm_radio_mode)
 		#endif
@@ -761,6 +762,7 @@ void MAIN_Key_EXIT(bool key_pressed, bool key_held)
 		}
 	#endif
 
+#ifdef ENABLE_DTMF
 	if (g_input_box_index > 0 || g_dtmf_input_box_index > 0 || g_dtmf_input_mode)
 	{	// cancel key input mode (channel/frequency entry)
 		g_dtmf_input_mode       = false;
@@ -771,7 +773,7 @@ void MAIN_Key_EXIT(bool key_pressed, bool key_held)
 		g_beep_to_play           = BEEP_1KHZ_60MS_OPTIONAL;
 		return;
 	}
-
+#endif
 	if (g_flash_light_state != FLASHLIGHT_OFF && g_flash_light_state != FLASHLIGHT_SOS)
 	{	// the the flash light off
 		g_flash_light_state = FLASHLIGHT_OFF;
@@ -908,6 +910,7 @@ void MAIN_Key_STAR(bool key_pressed, bool key_held)
 			return;
 		}
 
+#ifdef ENABLE_DTMF
 		if (g_scan_state_dir == SCAN_STATE_DIR_OFF && IS_NOT_NOAA_CHANNEL(g_tx_vfo->channel_save))
 		{	// start entering a DTMF string
 
@@ -921,6 +924,7 @@ void MAIN_Key_STAR(bool key_pressed, bool key_held)
 
 			g_request_display_screen = DISPLAY_MAIN;
 		}
+#endif
 	}
 	else
 	{	// with the F-key
@@ -1220,6 +1224,7 @@ void MAIN_process_key(key_code_t key, bool key_pressed, bool key_held)
 		}
 	#endif
 
+#ifdef ENABLE_DTMF
 	if (g_dtmf_input_mode)
 	{
 		const char Character = DTMF_GetCharacter(key);
@@ -1236,7 +1241,7 @@ void MAIN_process_key(key_code_t key, bool key_pressed, bool key_held)
 			return;
 		}
 	}
-
+#endif
 	switch (key)
 	{
 		case KEY_0:

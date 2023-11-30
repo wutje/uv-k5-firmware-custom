@@ -229,9 +229,10 @@ void Main(void)
 		#endif
 	#endif
 
+#ifdef ENABLE_DTMF
 	memset(g_dtmf_string, '-', sizeof(g_dtmf_string));
 	g_dtmf_string[sizeof(g_dtmf_string) - 1] = 0;
-
+#endif
 	#ifdef ENABLE_MDC1200
 		MDC1200_init();
 	#endif

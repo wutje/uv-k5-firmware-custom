@@ -199,6 +199,7 @@ void GENERIC_Key_PTT(bool key_pressed)
 	if (g_current_display_screen != DISPLAY_MENU)     // 1of11 .. don't close the menu
 		g_request_display_screen = DISPLAY_MAIN;
 
+#ifdef ENABLE_DTMF
 	if (!g_dtmf_input_mode && g_dtmf_input_box_index == 0)
 		goto start_tx;	// wasn't entering a DTMF code .. start TX'ing (maybe)
 
@@ -242,6 +243,7 @@ void GENERIC_Key_PTT(bool key_pressed)
 	}
 
 	DTMF_clear_input_box();
+#endif
 
 start_tx:
 	// request start TX

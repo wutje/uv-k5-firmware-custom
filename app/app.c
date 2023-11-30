@@ -197,9 +197,10 @@ static void APP_process_new_receive(void)
 
 	if (!g_squelch_open && !g_monitor_enabled)
 	{	// squelch is closed
-
+#ifdef ENABLE_DTMF
 		if (g_dtmf_rx_index > 0)
 			DTMF_clear_RX();
+#endif
 
 		if (g_current_function != FUNCTION_FOREGROUND)
 		{
@@ -246,7 +247,7 @@ static void APP_process_new_receive(void)
 	else
 	if (!flag)
 		return;
-
+#ifdef ENABLE_DTMF
 	if (g_scan_state_dir == SCAN_STATE_DIR_OFF && g_css_scan_mode == CSS_SCAN_MODE_OFF)
 	{	// not scanning
 
@@ -273,6 +274,7 @@ static void APP_process_new_receive(void)
 			}
 		}
 	}
+#endif
 
 	APP_start_listening();
 }
@@ -888,8 +890,10 @@ static bool APP_toggle_dual_watch_vfo(void)
 		return false;
 	if (g_ptt_is_pressed)
 		return false;
+#ifdef ENABLE_DTMF
 	if (g_dtmf_call_state != DTMF_CALL_STATE_NONE)
 		return false;
+#endif
 	#ifdef ENABLE_FMRADIO
 		if (g_fm_radio_mode)
 			return false;
@@ -1003,6 +1007,7 @@ void APP_process_radio_interrupts(void)
 				}
 		#endif
 
+#ifdef ENABLE_DTMF
 		if (int_bits & BK4819_REG_02_DTMF_5TONE_FOUND)
 		{	// save the RX'ed DTMF character
 			const char c = DTMF_GetCharacter(BK4819_GetDTMF_5TONE_Code());
@@ -1044,7 +1049,7 @@ void APP_process_radio_interrupts(void)
 				}
 			}
 		}
-
+#endif
 		if (int_bits & BK4819_REG_02_CxCSS_TAIL)
 		{
 			g_cxcss_tail_found          = true;
@@ -1516,7 +1521,7 @@ void APP_cancel_user_input_modes(void)
 		g_ask_to_delete  = false;
 		g_update_display = true;
 	}
-
+#ifdef ENABLE_DTMF
 	if (g_dtmf_input_mode || g_dtmf_input_box_index > 0)
 	{
 		DTMF_clear_input_box();
@@ -1530,6 +1535,7 @@ void APP_cancel_user_input_modes(void)
 		#endif
 		g_update_display = true;
 	}
+#endif
 
 	if (g_fkey_pressed || g_key_input_count_down > 0 || g_input_box_index > 0)
 	{
@@ -2106,9 +2112,11 @@ void APP_time_slice_500ms(void)
 		if (--g_menu_tick_10ms == 0)
 			exit_menu = (g_current_display_screen == DISPLAY_MENU);	// exit menu mode
 
+#ifdef ENABLE_DTMF
 	if (g_dtmf_rx_timeout > 0)
 		if (--g_dtmf_rx_timeout == 0)
 			DTMF_clear_RX();
+#endif
 
 	#ifdef ENABLE_FMRADIO
 		if (g_fm_radio_tick_500ms > 0)
@@ -2327,6 +2335,7 @@ void APP_time_slice_500ms(void)
 			return;
 	#endif
 
+#ifdef ENABLE_DTMF
 	if (g_current_function != FUNCTION_TRANSMIT)
 	{
 		if (g_dtmf_decode_ring_tick_500ms > 0)
@@ -2378,6 +2387,7 @@ void APP_time_slice_500ms(void)
 			g_update_display = true;
 		}
 	}
+#endif
 }
 
 void APP_time_slice_10ms(void)
@@ -2729,9 +2739,11 @@ static void APP_process_key(const key_code_t Key, const bool key_pressed, const 
 	if (key_pressed && g_current_display_screen == DISPLAY_MENU)
 		g_menu_tick_10ms = menu_timeout_500ms;
 
+#ifdef ENABLE_DTMF
 	// cancel the ringing
 	if (key_pressed && g_dtmf_decode_ring_tick_500ms > 0)
 		g_dtmf_decode_ring_tick_500ms = 0;
+#endif
 
 	// ********************
 
@@ -3038,10 +3050,12 @@ Skip:
 
 //		g_tx_vfo->freq_in_channel = SETTINGS_find_channel(frequency);
 
+#ifdef ENABLE_DTMF
 		g_dtmf_auto_reset_time_500ms = 0;
 		g_dtmf_call_state            = DTMF_CALL_STATE_NONE;
 		g_dtmf_tx_stop_tick_500ms    = 0;
 		g_dtmf_is_tx                 = false;
+#endif
 
 		g_vfo_rssi_bar_level[0] = 0;
 		g_vfo_rssi_bar_level[1] = 0;

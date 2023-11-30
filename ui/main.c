@@ -924,6 +924,7 @@ void UI_DisplayMain(void)
 		if (single_vfo >= 0 && single_vfo != vfo_num)
 			continue;	// we're in single VFO mode - screen is dedicated to just one VFO
 
+#ifdef ENABLE_DTMF
 		if (current_vfo_num != vfo_num)
 		{
 			if (g_dtmf_call_state != DTMF_CALL_STATE_NONE || g_dtmf_is_tx || g_dtmf_input_mode)
@@ -990,6 +991,7 @@ void UI_DisplayMain(void)
 				continue;
 			}
 		}
+#endif
 
 		if (single_vfo < 0)
 		{

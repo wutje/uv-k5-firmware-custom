@@ -4,6 +4,7 @@
 # 0 = remove code
 # 1 = include code
 
+ENABLE_DTMF                      := 0
 ENABLE_CLANG                     := 0
 ENABLE_SWD                       := 0
 ENABLE_OVERLAY                   := 0
@@ -329,8 +330,20 @@ endif
 ifeq ($(ENABLE_BIG_FREQ),1)
 	CFLAGS  += -DENABLE_BIG_FREQ
 endif
+
+#Enable DTMF sub options if DTMF is enabled
+ifeq ($(ENABLE_DTMF),1)
+	CFLAGS  += -DENABLE_DTMF_LIVE_DECODER
 ifeq ($(ENABLE_DTMF_LIVE_DECODER),1)
 	CFLAGS  += -DENABLE_DTMF_LIVE_DECODER
+endif
+ifeq ($(ENABLE_DTMF_CALL_FLASH_LIGHT),1)
+	CFLAGS  += -DENABLE_DTMF_CALL_FLASH_LIGHT
+endif
+else
+	ENABLE_DTMF_CALL_FLASH_LIGHT := 0
+	ENABLE_DTMF_LIVE_DECODER := 0
+
 endif
 ifeq ($(ENABLE_SHOW_FREQS_CHAN),1)
 	CFLAGS  += -DENABLE_SHOW_FREQS_CHAN
@@ -406,9 +419,6 @@ ifeq ($(ENABLE_CONTRAST),1)
 endif
 ifeq ($(ENABLE_BOOT_BEEPS),1)
 	CFLAGS  += -DENABLE_BOOT_BEEPS
-endif
-ifeq ($(ENABLE_DTMF_CALL_FLASH_LIGHT),1)
-	CFLAGS  += -DENABLE_DTMF_CALL_FLASH_LIGHT
 endif
 ifeq ($(ENABLE_FLASH_LIGHT_SOS_TONE),1)
 	CFLAGS  += -DENABLE_FLASH_LIGHT_SOS_TONE

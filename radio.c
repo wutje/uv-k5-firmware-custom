@@ -1150,7 +1150,9 @@ void RADIO_PrepareTX(void)
 			g_alarm_state = ALARM_STATE_OFF;
 		#endif
 
+#ifdef ENABLE_DTMF
 		g_dtmf_reply_state = DTMF_REPLY_NONE;
+#endif
 
 		AUDIO_PlayBeep(BEEP_500HZ_60MS_DOUBLE_BEEP_OPTIONAL);
 		return;
@@ -1163,6 +1165,7 @@ void RADIO_PrepareTX(void)
 		UART_printf("radio prepare tx %u %s\r\n", g_dtmf_reply_state, g_dtmf_string);
 	#endif
 
+#ifdef ENABLE_DTMF
 	if (g_dtmf_reply_state == DTMF_REPLY_ANI)
 	{
 		if (g_dtmf_call_mode == DTMF_CALL_MODE_DTMF)
@@ -1177,6 +1180,7 @@ void RADIO_PrepareTX(void)
 			g_dtmf_is_tx      = false;
 		}
 	}
+#endif
 
 	FUNCTION_Select(FUNCTION_TRANSMIT);
 }
@@ -1225,6 +1229,7 @@ void RADIO_tx_eot(void)
 		}
 	#endif
 
+#ifdef ENABLE_DTMF
 	if (g_dtmf_call_state == DTMF_CALL_STATE_NONE &&
 	   (g_current_vfo->channel.dtmf_ptt_id_tx_mode == PTT_ID_EOT || g_current_vfo->channel.dtmf_ptt_id_tx_mode == PTT_ID_BOTH))
 	{	// end-of-tx
@@ -1247,6 +1252,7 @@ void RADIO_tx_eot(void)
 		GPIO_ClearBit(&GPIOC->DATA, GPIOC_PIN_SPEAKER);
 	}
 	else
+#endif
 #ifdef ENABLE_MDC1200
 	if (g_current_vfo->channel.mdc1200_mode == MDC1200_MODE_EOT || g_current_vfo->channel.mdc1200_mode == MDC1200_MODE_BOTH)
 	{

@@ -34,18 +34,19 @@
 #include "settings.h"
 #include "ui/ui.h"
 
+#ifdef ENABLE_DTMF
 char               g_dtmf_string[15];
-				   
+				
 char               g_dtmf_input_box[15];
 uint8_t            g_dtmf_input_box_index;
 bool               g_dtmf_input_mode;
 uint8_t            g_dtmf_prev_index;
-				   
+				
 char               g_dtmf_rx[17];
 uint8_t            g_dtmf_rx_index;
 uint8_t            g_dtmf_rx_timeout;
 bool               g_dtmf_rx_pending;
-				   
+				
 #ifdef ENABLE_DTMF_LIVE_DECODER
 	char           g_dtmf_rx_live[20];
 	uint8_t        g_dtmf_rx_live_timeout;
@@ -474,3 +475,4 @@ bool DTMF_Reply(void)
 	
 	return true;
 }
+#endif

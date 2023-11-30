@@ -262,6 +262,7 @@ int MENU_GetLimits(uint8_t Cursor, int32_t *pMin, int32_t *pMax)
 		case MENU_S_ADD1:
 		case MENU_S_ADD2:
 		case MENU_STE:
+#ifdef ENABLE_DTMF
 		case MENU_DTMF_ST:
 		case MENU_DTMF_DCD:
 		#ifdef ENABLE_DTMF_LIVE_DECODER
@@ -270,7 +271,7 @@ int MENU_GetLimits(uint8_t Cursor, int32_t *pMin, int32_t *pMax)
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(g_sub_menu_off_on) - 1;
 			break;
-
+#endif
 		case MENU_MOD_MODE:
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(g_sub_menu_mod_mode) - 1;
@@ -323,11 +324,12 @@ int MENU_GetLimits(uint8_t Cursor, int32_t *pMin, int32_t *pMax)
 //			*pMax = 1;
 			*pMax = 2;
 			break;
-
+#ifdef ENABLE_DTMF
 		case MENU_DTMF_RSP:
 			*pMin = 0;
 			*pMax = ARRAY_SIZE(g_sub_menu_dtmf_rsp) - 1;
 			break;
+#endif
 
 		#ifdef ENABLE_MDC1200
 			case MENU_MDC1200_MODE:
@@ -351,6 +353,7 @@ int MENU_GetLimits(uint8_t Cursor, int32_t *pMin, int32_t *pMax)
 			*pMax = ARRAY_SIZE(g_sub_menu_bat_text) - 1;
 			break;
 
+#ifdef ENABLE_DTMF
 		case MENU_DTMF_HOLD:
 			*pMin = DTMF_HOLD_MIN;
 			*pMax = DTMF_HOLD_MAX;
@@ -365,6 +368,7 @@ int MENU_GetLimits(uint8_t Cursor, int32_t *pMin, int32_t *pMax)
 			*pMin = 1;
 			*pMax = 16;
 			break;
+#endif
 
 		#ifdef ENABLE_TX_POWER_CAL_MENU
 			case MENU_TX_CALI:
@@ -766,7 +770,7 @@ void MENU_AcceptSetting(void)
 		case MENU_BAT_TXT:
 			g_eeprom.config.setting.battery_text = g_sub_menu_selection;
 			break;
-
+#ifdef ENABLE_DTMF
 		case MENU_DTMF_DCD:
 			g_tx_vfo->channel.dtmf_decoding_enable = g_sub_menu_selection;
 			DTMF_clear_RX();
@@ -796,7 +800,7 @@ void MENU_AcceptSetting(void)
 				g_request_display_screen = DISPLAY_INVALID;
 			}
 			return;
-
+#endif
 		case MENU_PON_MSG:
 			g_eeprom.config.setting.power_on_display_mode = g_sub_menu_selection;
 			break;
@@ -1222,7 +1226,7 @@ void MENU_ShowCurrentSetting(void)
 				g_sub_menu_selection = g_eeprom.config.setting.alarm_mode;
 				break;
 #endif
-
+#ifdef ENABLE_DTMF
 		case MENU_DTMF_ST:
 			g_sub_menu_selection = g_eeprom.config.setting.dtmf.side_tone;
 			break;
@@ -1262,7 +1266,7 @@ void MENU_ShowCurrentSetting(void)
 		case MENU_DTMF_PRE:
 			g_sub_menu_selection = g_eeprom.config.setting.dtmf.preload_time;
 			break;
-
+#endif
 		#ifdef ENABLE_MDC1200
 			case MENU_MDC1200_MODE:
 				g_sub_menu_selection = g_tx_vfo->channel.mdc1200_mode;
@@ -1280,7 +1284,7 @@ void MENU_ShowCurrentSetting(void)
 		case MENU_BAT_TXT:
 			g_sub_menu_selection = g_eeprom.config.setting.battery_text;
 			return;
-
+#ifdef ENABLE_DTMF
 		case MENU_DTMF_DCD:
 			g_sub_menu_selection = SETTINGS_is_dtmf_enabled(g_tx_vfo);
 			break;
@@ -1294,6 +1298,7 @@ void MENU_ShowCurrentSetting(void)
 				g_sub_menu_selection = g_eeprom.config.setting.dtmf_live_decoder;
 				break;
 		#endif
+#endif
 
 		case MENU_PON_MSG:
 			g_sub_menu_selection = g_eeprom.config.setting.power_on_display_mode;
@@ -1992,7 +1997,7 @@ static void MENU_Key_UP_DOWN(bool key_pressed, bool key_held, int8_t Direction)
 			
 			// wrap
 			if (offset >= max_freq)
-				offset = 0;                    
+				offset = 0;
 			else
 			if (offset < 0)
 				offset = max_freq - step_size;

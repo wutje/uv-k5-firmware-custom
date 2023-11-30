@@ -1095,6 +1095,7 @@ void UI_DisplayMenu(void)
 			strcpy(str, g_sub_menu_bat_text[g_sub_menu_selection]);
 			break;
 
+#ifdef ENABLE_DTMF
 		case MENU_DTMF_LIST:
 		{
 			char Contact[17];
@@ -1113,7 +1114,7 @@ void UI_DisplayMenu(void)
 			}
 			break;
 		}
-
+#endif
 		case MENU_PON_MSG:
 			strcpy(str, g_sub_menu_pwr_on_msg[g_sub_menu_selection]);
 			break;
