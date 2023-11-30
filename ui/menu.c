@@ -111,22 +111,26 @@ const t_menu_item g_menu_list[] =
 #ifdef ENABLE_ALARM
 	{"SOS AL", VOICE_ID_INVALID,                       MENU_ALARM_MODE            }, // was "ALMODE"
 #endif
+#ifdef ENABLE_DTMF
 	{"ANI ID", VOICE_ID_ANI_CODE,                      MENU_ANI_ID                },
 	{"UpCODE", VOICE_ID_INVALID,                       MENU_UP_CODE               },
 	{"DnCODE", VOICE_ID_INVALID,                       MENU_DN_CODE               }, // was "DWCODE"
+#endif
 #ifdef ENABLE_MDC1200
 	{"MDCPTT", VOICE_ID_INVALID,                       MENU_MDC1200_MODE          },
 	{"MDC ID", VOICE_ID_INVALID,                       MENU_MDC1200_ID            },
 #endif
 	{"PTT ID", VOICE_ID_INVALID,                       MENU_PTT_ID                },
+#ifdef ENABLE_DTMF
 	{"D ST",   VOICE_ID_INVALID,                       MENU_DTMF_ST               },
-    {"D RSP",  VOICE_ID_INVALID,                       MENU_DTMF_RSP              },
+        {"D RSP",  VOICE_ID_INVALID,                       MENU_DTMF_RSP              },
 	{"D HOLD", VOICE_ID_INVALID,                       MENU_DTMF_HOLD             },
 	{"D PRE",  VOICE_ID_INVALID,                       MENU_DTMF_PRE              },
 	{"D DCD",  VOICE_ID_INVALID,                       MENU_DTMF_DCD              },
 	{"D LIST", VOICE_ID_INVALID,                       MENU_DTMF_LIST             },
 #ifdef ENABLE_DTMF_LIVE_DECODER
 	{"D LIVE", VOICE_ID_INVALID,                       MENU_DTMF_LIVE_DEC         }, // live DTMF decoder
+#endif
 #endif
 	{"PonMSG", VOICE_ID_INVALID,                       MENU_PON_MSG               },
 	{"ROGER",  VOICE_ID_INVALID,                       MENU_ROGER_MODE            },
@@ -825,7 +829,7 @@ void UI_DisplayMenu(void)
 			strcpy(str, "BSY CH TX\nLOCKOUT\n");
 			strcat(str, g_sub_menu_off_on[g_sub_menu_selection]);
 			break;
-
+#ifdef ENABLE_DTMF
 		#ifdef ENABLE_DTMF_LIVE_DECODER
 			case MENU_DTMF_LIVE_DEC:
 		#endif
@@ -835,6 +839,11 @@ void UI_DisplayMenu(void)
 			channel_setting = true;
 			break;
 
+		case MENU_DTMF_ST:
+			strcpy(str, "DTMF\nSIDETONE\n");
+			strcat(str, g_sub_menu_off_on[g_sub_menu_selection]);
+			break;
+#endif
 		case MENU_STE:
 			strcpy(str, "SUB TAIL\nELIMIN\n");
 			strcat(str, g_sub_menu_off_on[g_sub_menu_selection]);
@@ -843,11 +852,6 @@ void UI_DisplayMenu(void)
 		case MENU_BEEP:
 			strcpy(str, "KEY BEEP\n");
 			strcat(str + strlen(str), g_sub_menu_off_on[g_sub_menu_selection]);
-			break;
-
-		case MENU_DTMF_ST:
-			strcpy(str, "DTMF\nSIDETONE\n");
-			strcat(str, g_sub_menu_off_on[g_sub_menu_selection]);
 			break;
 
 		#ifdef ENABLE_NOAA
@@ -1017,7 +1021,7 @@ void UI_DisplayMenu(void)
 				sprintf(str + strlen(str), g_sub_menu_alarm_mode[g_sub_menu_selection]);
 				break;
 		#endif
-
+#ifdef ENABLE_DTMF
 		case MENU_ANI_ID:
 			strcpy(str, "DTMF ID\n");
 			strcat(str, g_eeprom.config.setting.dtmf.ani_id);
@@ -1073,7 +1077,7 @@ void UI_DisplayMenu(void)
 			strcpy(str, "DTMF BOT\nDELAY\n");
 			sprintf(str + strlen(str), "%dms", 10 * g_sub_menu_selection);
 			break;
-
+#endif
 		#ifdef ENABLE_MDC1200
 			case MENU_MDC1200_MODE:
 				strcpy(str, "MDC1200\nMODE\n");
@@ -1086,10 +1090,12 @@ void UI_DisplayMenu(void)
 				break;
 		#endif
 
+#ifdef ENABLE_DTMF
 		case MENU_PTT_ID:
 			strcpy(str, g_sub_menu_ptt_id[g_sub_menu_selection]);
 			channel_setting = true;
 			break;
+#endif
 
 		case MENU_BAT_TXT:
 			strcpy(str, g_sub_menu_bat_text[g_sub_menu_selection]);
@@ -1371,6 +1377,7 @@ void UI_DisplayMenu(void)
 	if ((g_menu_cursor == MENU_RX_CTCSS || g_menu_cursor == MENU_RX_CDCSS) && g_css_scan_mode != CSS_SCAN_MODE_OFF)
 		UI_PrintString("SCAN", sub_menu_x1, sub_menu_x2, 4, 8);
 
+#ifdef ENABLE_DTMF
 	if (g_menu_cursor == MENU_UP_CODE)
 		if (strlen(g_eeprom.config.setting.dtmf.key_up_code) > 8)
 			UI_PrintString(g_eeprom.config.setting.dtmf.key_up_code + 8, sub_menu_x1, sub_menu_x2, 4, 8);
@@ -1378,18 +1385,24 @@ void UI_DisplayMenu(void)
 	if (g_menu_cursor == MENU_DN_CODE)
 		if (strlen(g_eeprom.config.setting.dtmf.key_down_code) > 8)
 			UI_PrintString(g_eeprom.config.setting.dtmf.key_down_code + 8, sub_menu_x1, sub_menu_x2, 4, 8);
+#endif
 
 	if (g_menu_cursor == MENU_RX_CTCSS ||
 	    g_menu_cursor == MENU_TX_CTCSS ||
 	    g_menu_cursor == MENU_RX_CDCSS ||
-	    g_menu_cursor == MENU_TX_CDCSS ||
-	    g_menu_cursor == MENU_DTMF_LIST)
+	    g_menu_cursor == MENU_TX_CDCSS
+#ifdef ENABLE_DTMF
+	    || g_menu_cursor == MENU_DTMF_LIST
+#endif
+            )
 	{
 		if (g_in_sub_menu)
 		{
-			unsigned int Offset;
+			unsigned int Offset = 3;
 			NUMBER_ToDigits(g_sub_menu_selection, str);
+#ifdef ENABLE_DTMF
 			Offset = (g_menu_cursor == MENU_DTMF_LIST) ? 2 : 3;
+#endif
 			UI_Displaysmall_digits(Offset, str + (8 - Offset), 105, 0, false);
 		}
 	}

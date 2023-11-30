@@ -727,7 +727,7 @@ void MENU_AcceptSetting(void)
 				g_eeprom.config.setting.alarm_mode = g_sub_menu_selection;
 				break;
 		#endif
-
+#ifdef ENABLE_DTMF
 		case MENU_DTMF_ST:
 			g_eeprom.config.setting.dtmf.side_tone = g_sub_menu_selection;
 			break;
@@ -743,6 +743,7 @@ void MENU_AcceptSetting(void)
 		case MENU_DTMF_PRE:
 			g_eeprom.config.setting.dtmf.preload_time = g_sub_menu_selection;
 			break;
+#endif
 
 		#ifdef ENABLE_MDC1200
 			case MENU_MDC1200_MODE:
@@ -754,6 +755,7 @@ void MENU_AcceptSetting(void)
 				g_eeprom.config.setting.mdc1200_id = g_sub_menu_selection;
 				break;
 		#endif
+#ifdef ENABLE_DTMF
 
 		case MENU_PTT_ID:
 			g_tx_vfo->channel.dtmf_ptt_id_tx_mode = g_sub_menu_selection;
@@ -766,7 +768,7 @@ void MENU_AcceptSetting(void)
 			}
 			g_request_save_channel = 1;
 			return;
-
+#endif
 		case MENU_BAT_TXT:
 			g_eeprom.config.setting.battery_text = g_sub_menu_selection;
 			break;
