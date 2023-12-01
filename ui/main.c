@@ -601,6 +601,7 @@ void UI_DisplayCenterLine(void)
 			#if 1
 				if (g_eeprom.config.setting.dtmf_live_decoder && g_dtmf_rx_live[0] != 0)
 				{	// show live DTMF decode
+                                        char str[22];
 					const unsigned int len = strlen(g_dtmf_rx_live);
 					const unsigned int idx = (len > (17 - 5)) ? len - (17 - 5) : 0;  // limit to last 'n' chars
 
