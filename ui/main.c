@@ -648,6 +648,7 @@ void UI_DisplayCenterLine(void)
 			else
 			if (g_charging_with_type_c)
 			{	// show the battery charge state
+                char str[22];
 				if (
 					#ifdef ENABLE_DTMF_CALLING
 						g_dtmf_call_state != DTMF_CALL_STATE_NONE ||
