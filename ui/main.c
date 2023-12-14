@@ -676,16 +676,11 @@ const char *state_list[] = {"", "BUSY", "BAT LOW", "TX DISABLE", "TIMEOUT", "ALA
 	{
 		const int          vfo_num    = g_eeprom.config.setting.tx_vfo_num;
 		const unsigned int scrn_chan  = g_eeprom.config.setting.indices.vfo[vfo_num].screen;
-		const unsigned int state      = g_vfo_state[vfo_num];
+		unsigned int state      = g_vfo_state[vfo_num];
 		bool               tx_allowed = false;
 		uint8_t           *p_line1    = g_frame_buffer[1];
 		const vfo_info_t  *p_vfo      = &g_vfo_info[vfo_num];
 		char               str[22];
-
-		#ifdef ENABLE_SHOW_FREQ_IN_CHAN
-			const uint8_t freq_in_channel = p_vfo->freq_in_channel;
-			//const uint8_t freq_in_channel = SETTINGS_find_channel(frequency);  // was way to slow
-		#endif
 
 		#ifdef ENABLE_ALARM
 			if (g_current_function == FUNCTION_TRANSMIT && g_alarm_state == ALARM_STATE_ALARM)
@@ -866,6 +861,9 @@ const char *state_list[] = {"", "BUSY", "BAT LOW", "TX DISABLE", "TIMEOUT", "ALA
 						#endif
 
 						#ifdef ENABLE_SHOW_FREQ_IN_CHAN
+                            const uint8_t freq_in_channel = p_vfo->freq_in_channel;
+                            //const uint8_t freq_in_channel = SETTINGS_find_channel(frequency);  // was way to slow
+
 							UI_PrintString(str, x, 0, y, 8);
 
 							if (IS_FREQ_CHANNEL(scrn_chan) && freq_in_channel <= USER_CHANNEL_LAST)
