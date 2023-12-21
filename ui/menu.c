@@ -392,8 +392,6 @@ const char g_sub_menu_side_butt[9][16] =
 };
 #endif
 
-const char back_light_str[] = "BACKLITE\n";
-
 // ***************************************************************************************
 
 uint8_t g_menu_list_sorted[ARRAY_SIZE(g_menu_list)];
@@ -538,8 +536,7 @@ void UI_DisplayMenu(void)
 		else
 		if (menu_index >= 0 && menu_index < (int)g_menu_list_count)
 		{	// current menu item
-			strcpy(str, g_menu_list[g_menu_list_sorted[menu_index]].name);
-			UI_PrintString(str, 0, 0, 0, 8);
+			UI_PrintString(g_menu_list[g_menu_list_sorted[menu_index]].name, 0, 0, 0, 8);
 		}
 	}
 	#endif
@@ -553,8 +550,7 @@ void UI_DisplayMenu(void)
 	switch (g_menu_cursor)
 	{
 		case MENU_SQL:
-			strcpy(str, "MAIN SQL\n");
-			sprintf(str + strlen(str), "%d\n ", g_sub_menu_selection);
+			sprintf(str, "MAIN SQL\n%d\n ", g_sub_menu_selection);
 			break;
 
 		case MENU_CHAN_SQL:
@@ -608,14 +604,21 @@ void UI_DisplayMenu(void)
 
 		case MENU_RX_CDCSS:
 		case MENU_TX_CDCSS:
-			//strcpy(str, "CDCSS\n");
-			if (g_sub_menu_selection == 0)
-				strcat(str, "OFF");
-			else
-			if (g_sub_menu_selection < 105)
-				sprintf(str + strlen(str), "D%03oN", DCS_CODE_LIST[g_sub_menu_selection -   1]);
-			else
-				sprintf(str + strlen(str), "D%03oI", DCS_CODE_LIST[g_sub_menu_selection - 105]);
+            if (g_sub_menu_selection == 0)
+                strcat(str, "OFF");
+            else {
+                uint8_t code;
+                char ch;
+                if (g_sub_menu_selection < 105) {
+                    code = DCS_CODE_LIST[g_sub_menu_selection -   1];
+                    ch = 'N';
+                }
+                else {
+                    code = DCS_CODE_LIST[g_sub_menu_selection -   105];
+                    ch = 'I';
+                }
+                sprintf(str, "D%03o%c", code, ch);
+            }
 			channel_setting = true;
 			break;
 
@@ -623,14 +626,12 @@ void UI_DisplayMenu(void)
 		case MENU_TX_CTCSS:
 		{
 			channel_setting = true;
-			//strcpy(str, "CTCSS\n");
 			#if 1
 				// set CTCSS as the user adjusts it
 				unsigned int Code;
 				freq_config_t *pConfig = (g_menu_cursor == MENU_RX_CTCSS) ? &g_tx_vfo->freq_config_rx : &g_tx_vfo->freq_config_tx;
 				if (g_sub_menu_selection == 0)
 				{
-					strcat(str, "OFF");
 
 					if (pConfig->code_type != CODE_TYPE_CONTINUOUS_TONE)
 						break;
@@ -640,10 +641,11 @@ void UI_DisplayMenu(void)
 					pConfig->code = Code;
 
 					BK4819_disable_sub_audible();
+					strcpy(str, "CTCSS\nOFF");
 				}
 				else
 				{
-					sprintf(str + strlen(str), "%u.%uHz", CTCSS_TONE_LIST[g_sub_menu_selection - 1] / 10, CTCSS_TONE_LIST[g_sub_menu_selection - 1] % 10);
+					sprintf(str, "CTCSS\n%u.%uHz", CTCSS_TONE_LIST[g_sub_menu_selection - 1] / 10, CTCSS_TONE_LIST[g_sub_menu_selection - 1] % 10);
 
 					pConfig->code_type = CODE_TYPE_CONTINUOUS_TONE;
 					Code = g_sub_menu_selection - 1;
@@ -652,6 +654,7 @@ void UI_DisplayMenu(void)
 					BK4819_set_CTCSS_freq(CTCSS_TONE_LIST[Code]);
 				}
 			#else
+                                strcpy(str, "CTCSS\n");
 				if (g_sub_menu_selection == 0)
 					strcat(str, "OFF");
 				else
@@ -730,14 +733,12 @@ void UI_DisplayMenu(void)
 		#endif
 
 		case MENU_AUTO_BACKLITE:
-			strcpy(str, back_light_str);
-			strcat(str, g_sub_menu_backlight[g_sub_menu_selection]);
+			sprintf(str, "BACKLITE\n%s", g_sub_menu_backlight[g_sub_menu_selection]);
 			BACKLIGHT_turn_on(5);
 			break;
 
 		case MENU_AUTO_BACKLITE_ON_TX_RX:
-			strcpy(str, back_light_str);
-			strcat(str, g_sub_menu_rx_tx[g_sub_menu_selection]);
+			sprintf(str, "BACKLITE\n%s", g_sub_menu_rx_tx[g_sub_menu_selection]);
 			break;
 
 		case MENU_MOD_MODE:
@@ -774,6 +775,7 @@ void UI_DisplayMenu(void)
 				#else
 					sprintf(str, "%d", g_sub_menu_selection);
 				#endif
+				//g_setting_contrast = g_sub_menu_selection
 				ST7565_SetContrast(g_sub_menu_selection);
 				g_update_display = true;
 				break;
@@ -815,8 +817,7 @@ void UI_DisplayMenu(void)
 			break;
 
 		case MENU_BUSY_CHAN_LOCK:
-			strcpy(str, "BSY CH TX\nLOCKOUT\n");
-			strcat(str, g_sub_menu_off_on[g_sub_menu_selection]);
+			sprintf(str, "BSY CH TX\nLOCKOUT\n%s", g_sub_menu_off_on[g_sub_menu_selection]);
 			break;
 
 		#if defined(ENABLE_DTMF_LIVE_DECODER) && defined(ENABLE_DTMF_CALLING)
@@ -841,24 +842,20 @@ void UI_DisplayMenu(void)
 		#endif
 
 		case MENU_STE:
-			strcpy(str, "SUB TAIL\nELIMIN\n");
-			strcat(str, g_sub_menu_off_on[g_sub_menu_selection]);
+			sprintf(str, "SUB TAIL\nELIMIN\n%s", g_sub_menu_off_on[g_sub_menu_selection]);
 			break;
 
 		case MENU_BEEP:
-			strcpy(str, "KEY BEEP\n");
-			strcat(str + strlen(str), g_sub_menu_off_on[g_sub_menu_selection]);
+			sprintf(str, "KEY BEEP\n%s", g_sub_menu_off_on[g_sub_menu_selection]);
 			break;
 
 		case MENU_DTMF_ST:
-			strcpy(str, "DTMF\nSIDETONE\n");
-			strcat(str, g_sub_menu_off_on[g_sub_menu_selection]);
+			sprintf(str, "DTMF\nSIDETONE\n%s", g_sub_menu_off_on[g_sub_menu_selection]);
 			break;
 
 		#ifdef ENABLE_NOAA
 			case MENU_NOAA_SCAN:
-				strcpy(str, "SCAN\n");
-				strcat(str, g_sub_menu_off_on[g_sub_menu_selection]);
+				sprintf(str, "SCAN\n%s", g_sub_menu_off_on[g_sub_menu_selection]);
 				break;
 		#endif
 
@@ -936,9 +933,7 @@ void UI_DisplayMenu(void)
 				if (!g_in_sub_menu || g_edit_index < 0)
 				{	// show the channel name
 					SETTINGS_fetch_channel_name(str, g_sub_menu_selection);
-					if (str[0] == 0)
-						strcpy(str, "--");
-					UI_PrintString(str, sub_menu_x1, sub_menu_x2, y + 2, 8);
+					UI_PrintString(str[0] == 0 ? "--" : str, sub_menu_x1, sub_menu_x2, y + 2, 8);
 				}
 				else
 				{	// show the channel name being edited
@@ -1001,16 +996,15 @@ void UI_DisplayMenu(void)
 			strcpy(str, g_sub_menu_off_on[g_sub_menu_selection]);
 			break;
 
-		case MENU_SCAN_CAR_RESUME:
-			strcpy(str, "SCAN\nRESUME\n");
-			strcat(str, g_sub_menu_scan_car_resume[g_sub_menu_selection]);
+		case MENU_SCAN_CAR_RESUME: {
+			size_t len = sprintf(str, "SCAN\nRESUME\n%s", g_sub_menu_scan_car_resume[g_sub_menu_selection]);
 			if (g_sub_menu_selection == SCAN_RESUME_TIME)
-				sprintf(str + strlen(str), "%d.%ds", g_eeprom.config.setting.scan_hold_time / 2, 5 * (g_eeprom.config.setting.scan_hold_time % 2));
+				sprintf(str + len, "%d.%ds", g_eeprom.config.setting.scan_hold_time / 2, 5 * (g_eeprom.config.setting.scan_hold_time % 2));
+                        }
 			break;
 
 		case MENU_SCAN_HOLD:
-			strcpy(str, "SCAN HOLD\n");
-			sprintf(str + strlen(str), "%d.%d sec", g_sub_menu_selection / 2, 5 * (g_sub_menu_selection % 2));
+			sprintf(str, "SCAN HOLD\n""%d.%d sec", g_sub_menu_selection / 2, 5 * (g_sub_menu_selection % 2));
 			break;
 
 		case MENU_MEM_DISP:
@@ -1041,20 +1035,17 @@ void UI_DisplayMenu(void)
 
 		#ifdef ENABLE_DTMF_CALLING
 			case MENU_ANI_ID:
-				strcpy(str, "DTMF ID\n");
-				strcat(str, g_eeprom.config.setting.dtmf.ani_id);
+				sprintf(str, "DTMF ID\n%s", g_eeprom.config.setting.dtmf.ani_id);
 				break;
 		#endif
 
 		case MENU_UP_CODE:
-			strcpy(str, "DTMF BOT\n");
-			strcat(str, g_eeprom.config.setting.dtmf.key_up_code);
+			sprintf(str, "DTMF BOT\n%s", g_eeprom.config.setting.dtmf.key_up_code);
 			channel_setting = true;
 			break;
 
 		case MENU_DN_CODE:
-			strcpy(str, "DTMF EOT\n");
-			strcat(str, g_eeprom.config.setting.dtmf.key_down_code);
+			sprintf(str, "DTMF EOT\n%s", g_eeprom.config.setting.dtmf.key_down_code);
 			channel_setting = true;
 			break;
 
@@ -1074,11 +1065,10 @@ void UI_DisplayMenu(void)
 
 		#ifdef ENABLE_DTMF_CALLING
 			case MENU_DTMF_RSP:
-				strcpy(str, "DTMF\nRESP\n");
-				strcat(str, g_sub_menu_dtmf_rsp[g_sub_menu_selection]);
+			    sprintf(str, "DTMF\nRESP\n%s", g_sub_menu_dtmf_rsp[g_sub_menu_selection]);
 				channel_setting = true;
 				break;
-	
+
 			case MENU_DTMF_HOLD:
 				// only allow 5, 10, 20, 30, 40, 50 or "STAY ON SCREEN" (60)
 				switch (g_sub_menu_selection)
@@ -1098,13 +1088,13 @@ void UI_DisplayMenu(void)
 					case 59: g_sub_menu_selection = 50; break;
 					case 61: g_sub_menu_selection =  5; break;
 				}
-	
+
 				strcpy(str, "DTMF MSG\n");
 				if (g_sub_menu_selection < DTMF_HOLD_MAX)
 					sprintf(str + strlen(str), "%d sec", g_sub_menu_selection);
 				else
 					strcat(str, "STAY ON\nSCRN");  // 60
-	
+
 				break;
 
 			case MENU_DTMF_LIST:
@@ -1159,8 +1149,7 @@ void UI_DisplayMenu(void)
 
 		#ifdef ENABLE_MDC1200
 			case MENU_MDC1200_MODE:
-				strcpy(str, "MDC1200\nMODE\n");
-				strcat(str, g_sub_menu_mdc1200_mode[g_sub_menu_selection]);
+				sprintf(str, "MDC1200\nMODE\n%s", g_sub_menu_mdc1200_mode[g_sub_menu_selection]);
 				channel_setting = true;
 				break;
 
@@ -1194,7 +1183,7 @@ void UI_DisplayMenu(void)
 			case MENU_SIDE2_SHORT:
 			case MENU_SIDE2_LONG:
 				strcpy(str, g_sub_menu_side_butt[g_sub_menu_selection]);
-				#if defined(ENABLE_TX_TONE_HZ) && (ENABLE_TX_TONE_HZ > 0) 
+				#if defined(ENABLE_TX_TONE_HZ) && (ENABLE_TX_TONE_HZ > 0)
 					if (g_sub_menu_selection == ACTION_OPT_TX_TONE)
 						sprintf(str + strlen(str), "\n%uHz", ENABLE_TX_TONE_HZ);
 				#endif
@@ -1409,9 +1398,7 @@ void UI_DisplayMenu(void)
 
 			// channel name
 			SETTINGS_fetch_channel_name(str, g_sub_menu_selection);
-			if (str[0] == 0)
-				strcpy(str, "--");
-			UI_PrintString(str, sub_menu_x1, sub_menu_x2, 2, 8);
+			UI_PrintString(str[0] == 0 ? "--" : str, sub_menu_x1, sub_menu_x2, 2, 8);
 		}
 		else
 		{
@@ -1421,9 +1408,7 @@ void UI_DisplayMenu(void)
 			// channel name
 			memset(str, 0, sizeof(str));
 			SETTINGS_fetch_channel_name(str, g_sub_menu_selection);
-			if (str[0] == 0)
-				strcpy(str, "--");
-			UI_PrintStringSmall(str, sub_menu_x1, sub_menu_x2, 2);
+			UI_PrintStringSmall(str[0] == 0 ? "--" : str, sub_menu_x1, sub_menu_x2, 2);
 
 			if (IS_USER_CHANNEL(g_eeprom.config.setting.priority_scan_list[i].channel[0]))
 			{
